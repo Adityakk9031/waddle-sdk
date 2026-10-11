@@ -27,7 +27,7 @@ ships; this root file always carries `[Unreleased]` plus pointers.
   admission without an extra per-frame interpreter handoff.
 
 - Prepare matching SDK and media wheels as 0.1.13; the optional preview bindings
-  require API 7, which was not included in the published 0.1.12 pair.
+  require API 9, which was not included in the published 0.1.12 pair.
 
 - Add optional LiveKit preview width, fps and per-track bitrate ceilings, RGB-only
   presentation and demand-driven publisher dynacast. Preserve original RGB-D
@@ -35,7 +35,7 @@ ships; this root file always carries `[Unreleased]` plus pointers.
 - Bound pending video to the latest frame and separate its native worker from
   control-plane stills. Lower Linux media worker priority and bound publication
   waits. Demand-driven preview signaling starts/retries asynchronously, without
-  delaying session startup. Python/native binding API advances to 7; rebuild both extensions.
+  delaying session startup. Python/native binding API advances to 9; rebuild both extensions.
 
 ## Released changelogs
 
