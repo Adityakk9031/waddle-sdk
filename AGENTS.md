@@ -1,5 +1,10 @@
 # AGENTS.md — waddle-sdk monorepo
 
+RealSense RGB intrinsics retain the active vendor distortion model. The public
+descriptor/wire enum distinguishes modified and inverse Brown–Conrady from ROS
+plumb_bob; older unspecified declarations remain unspecified. Images are not
+rectified by publishing this metadata. Consumers must support the declared model.
+
 Optional gripper force control uses `GripperForceDriver` and the public runtime
 `GripperForce` observation. Named `JointPositionCommand.gripper_force_n` is
 admitted by the existing native gate and owner envelope before driver activation.

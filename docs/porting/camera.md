@@ -1,5 +1,11 @@
 # Camera adapters
 
+RealSense active RGB intrinsics retain their distortion model and coefficients.
+`Intrinsics` distinguishes `plumb_bob`, `modified_brown_conrady`, and
+`inverse_brown_conrady`; these are different projection conventions. Publishing
+metadata does not rectify pixels. Consumers must use the declared model, and
+leave unsupported or unspecified nonzero distortion explicitly unresolved.
+
 A camera entry names an importable factory:
 
 ```yaml

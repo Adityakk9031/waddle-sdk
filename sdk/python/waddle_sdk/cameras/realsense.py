@@ -160,6 +160,12 @@ class RealSenseDriver:
                 cx=float(raw.ppx),
                 cy=float(raw.ppy),
                 distortion=coefficients,
+                distortion_model={
+                    "distortion.brown_conrady": "plumb_bob",
+                    "distortion.modified_brown_conrady": "modified_brown_conrady",
+                    "distortion.inverse_brown_conrady": "inverse_brown_conrady",
+                    "distortion.kannala_brandt4": "kannala_brandt",
+                }.get(str(getattr(raw, "model", "")), "unspecified"),
                 depth_scale_mm=self.depth_scale_mm,
             )
         except (AttributeError, TypeError, ValueError):

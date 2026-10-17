@@ -146,6 +146,7 @@ class _RsPipeline:
             ppx=321.0,
             ppy=239.0,
             coeffs=[0.0, 0.0, 0.0, 0.0, 0.0],
+            model=self.behavior.get("model", "distortion.none"),
         )
         stream = SimpleNamespace(
             as_video_stream_profile=lambda: SimpleNamespace(
@@ -326,3 +327,27 @@ def test_realsense_fails_after_one_bounded_hardware_reset(monkeypatch):
 
     assert vendor.device.resets == 1
     assert [pipeline.stops for pipeline in vendor.pipelines] == [1, 1]
+
+
+@pytest.mark.parametrize(
+    "vendor_model, public_model",
+    [
+        ("brown_conrady", "PLUMB_BOB"),
+        ("modified_brown_conrady", "MODIFIED_BROWN_CONRADY"),
+        ("inverse_brown_conrady", "INVERSE_BROWN_CONRADY"),
+        ("kannala_brandt4", "KANNALA_BRANDT"),
+    ],
+)
+def test_realsense_preserves_active_rgb_lens_model(
+    monkeypatch, vendor_model, public_model
+):
+    vendor = _RsVendor([{"confirm": True, "model": "distortion." + vendor_model}])
+    _fast_realsense(monkeypatch, vendor)
+    driver = realsense.RealSenseDriver(serial="rs-test", width=3, height=2)
+    try:
+        assert (
+            driver.intrinsics()._compile()["model"]
+            == "DISTORTION_MODEL_" + public_model
+        )
+    finally:
+        driver.close()
