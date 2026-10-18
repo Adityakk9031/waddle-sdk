@@ -13,6 +13,9 @@ ships; this root file always carries `[Unreleased]` plus pointers.
 
 ### Fixed
 
+- Require complete Orbbec color/depth framesets before alignment; report absent
+  filter output as an Orbbec RGB-D error instead of a Python attribute error.
+
 - Preserve active RealSense RGB distortion identity, including append-only wire values for modified and inverse Brown–Conrady. Do not mislabel these images as rectified or ROS plumb_bob.
 
 - Add `waddle_sdk.media.PreviewPublisher` for camera-only RGB publication from a

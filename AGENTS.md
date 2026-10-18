@@ -1,5 +1,9 @@
 # AGENTS.md — waddle-sdk monorepo
 
+The Orbbec RGB-D adapter requires complete native color/depth frame aggregation
+before alignment and reports absent aligned output as a scoped camera error.
+It never returns an unaligned pair or infers a missing depth frame.
+
 RealSense RGB intrinsics retain the active vendor distortion model. The public
 descriptor/wire enum distinguishes modified and inverse Brown–Conrady from ROS
 plumb_bob; older unspecified declarations remain unspecified. Images are not
