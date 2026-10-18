@@ -25,9 +25,13 @@ def test_aligned_orbbec_samples_are_paired_or_report_the_alignment_gap(available
     )
     driver = object.__new__(OrbbecDriver)
     driver._pipeline = SimpleNamespace(wait_for_frames=lambda _timeout: object())
-    driver._align = SimpleNamespace(process=lambda _frames: aligned if available else None)
+    driver._align = SimpleNamespace(
+        process=lambda _frames: aligned if available else None
+    )
     if not available:
-        with pytest.raises(RuntimeError, match="Orbbec alignment returned no RGB-D frameset"):
+        with pytest.raises(
+            RuntimeError, match="Orbbec alignment returned no RGB-D frameset"
+        ):
             driver.capture()
         return
     sample = driver.capture()

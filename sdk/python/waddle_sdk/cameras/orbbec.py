@@ -56,9 +56,7 @@ class OrbbecDriver:
             sdk.OBFormat.RGB,
             fps,
         )
-        depth_format = getattr(
-            sdk.OBFormat, "Y16", getattr(sdk.OBFormat, "Z16", None)
-        )
+        depth_format = getattr(sdk.OBFormat, "Y16", getattr(sdk.OBFormat, "Z16", None))
         if depth_format is None:
             raise RuntimeError(
                 "this pyorbbecsdk build exposes neither Y16 nor Z16 depth"
