@@ -1,5 +1,12 @@
 # AGENTS.md — waddle-sdk monorepo
 
+YAM feedback reads use a single completed immutable vendor JointStates publication
+when the installed I2RT observation/publication/allocation code matches the
+verified semantic source hashes. This avoids the motor-transaction lock without
+changing the motor loop, commands or CAN liveness/stall checks. Unverified vendor
+implementations retain their original observation method; startup reports the
+selected read path. Software snapshot probes are separate from physical cadence.
+
 RealSense RGB intrinsics retain the active vendor distortion model. The public
 descriptor/wire enum distinguishes modified and inverse Brown–Conrady from ROS
 plumb_bob; older unspecified declarations remain unspecified. Images are not

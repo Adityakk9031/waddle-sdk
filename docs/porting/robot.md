@@ -185,6 +185,13 @@ actually valid.
 
 ## YAM gravity compensation
 
+For the verified pinned I2RT publisher, feedback reads retain one completed
+immutable `JointStates` value instead of waiting for the lock held across motor
+communication. Observation, publication and state-allocation method bodies are
+checked before selecting this path. Other revisions retain the vendor read
+method. Startup reports the selection; CAN/server liveness and feedback-stall
+checks remain unchanged. No extra hardware owner or feedback timestamp is added.
+
 The YAM factories accept `gravity_comp_factor`, an absolute six-joint vector in
 arm joint order. Its default is `[1.0, 1.1, 1.2, 1.3, 1.0, 1.0]`; the third and
 fourth factors are rounded two-arm bench calibration, not vendor ratings or a
