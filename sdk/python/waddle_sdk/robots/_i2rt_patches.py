@@ -24,8 +24,11 @@ command off to the side and swaps it under the vendor's own lock.
 
 from __future__ import annotations
 
+import ast
+import hashlib
 import inspect
 import logging
+import textwrap
 import time
 from typing import Any
 
@@ -45,6 +48,79 @@ _EXPECTED_TRANSACTION_PARAMETERS = (
     "expected_id",
 )
 _ROOT_LOG = logging.getLogger()
+
+# Pinned I2RT publishes an entirely new JointStates after each completed CAN
+# transaction. Verify that publication and allocation code, not just its API,
+# before bypassing its lock (which also spans the motor transaction).
+_SNAPSHOT_METHODS = {
+    "get_observations": "aa56a8692b696e19f2edbf3891c17a8b86f35c571be64565ac4ff74f27f4e048",
+    "_update_joint_state": "4bee43a3572d41bfea706467e465d319d4861c7270b629383aa9f838f514c7a3",
+    "_motor_state_to_joint_state": "4e172c593816bd827a356e9a34602d464e19bad348e00e83a7baebf0a0b19c71",
+}
+
+
+def _observation_snapshot(self: Any) -> dict:
+    """I2RT observation layout from one completed, immutable publication.
+
+    Equivalent to the pinned vendor's get_observations, retaining a single
+    JointStates reference instead of waiting on the CAN transaction's lock.
+    Python keeps that publication alive while a writer publishes the next one.
+    The adapter's separate CAN liveness/stall checks remain authoritative.
+    """
+    import numpy as np
+
+    state = self._joint_state
+    index = self._gripper_index
+    if index is None:
+        result = {
+            "joint_pos": state.pos,
+            "joint_vel": state.vel,
+            "joint_eff": state.eff,
+        }
+    else:
+        result = {
+            "joint_pos": state.pos[:index],
+            "joint_vel": state.vel[:index],
+            "joint_eff": state.eff[:index],
+            "gripper_pos": np.array([state.pos[index]]),
+            "gripper_vel": np.array([state.vel[index]]),
+            "gripper_eff": np.array([state.eff[index]]),
+        }
+    if self.temp_record_flag:
+        result.update(temp_mos=state.temp_mos, temp_rotor=state.temp_rotor)
+    return result
+
+
+_observation_snapshot._waddle_snapshot_patch = True  # type: ignore[attr-defined]
+
+
+def apply_observation_snapshot_patch(robot_type: type[Any]) -> bool:
+    """Use short snapshot reads only for the verified immutable I2RT publisher.
+
+    Other vendor revisions/types retain their existing observation method.
+    No motor-loop code, freshness policy or command path is changed.
+    """
+    if getattr(
+        getattr(robot_type, "get_observations", None), "_waddle_snapshot_patch", False
+    ):
+        return True
+    for name, expected in _SNAPSHOT_METHODS.items():
+        try:
+            source = textwrap.dedent(inspect.getsource(getattr(robot_type, name)))
+            method = ast.parse(source).body[0]
+            if ast.get_docstring(method) is not None:
+                method.body = method.body[1:]
+        except (AttributeError, TypeError, OSError, SyntaxError):
+            return False
+        if (
+            hashlib.sha256(
+                ast.dump(method, include_attributes=False).encode()
+            ).hexdigest()
+            != expected
+        ):
+            return False
+    robot_type.get_observations = _observation_snapshot
+    return True
 
 
 def _receive_message_starvation_tolerant(
@@ -230,4 +306,8 @@ def apply_command_state_atomic_patch(robot_type: type[Any] | None = None) -> boo
     return True
 
 
-__all__ = ["apply_command_state_atomic_patch", "apply_recv_starvation_patch"]
+__all__ = [
+    "apply_command_state_atomic_patch",
+    "apply_observation_snapshot_patch",
+    "apply_recv_starvation_patch",
+]

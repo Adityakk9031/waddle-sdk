@@ -1,5 +1,11 @@
 # Camera adapters
 
+RealSense active RGB intrinsics retain their distortion model and coefficients.
+`Intrinsics` distinguishes `plumb_bob`, `modified_brown_conrady`, and
+`inverse_brown_conrady`; these are different projection conventions. Publishing
+metadata does not rectify pixels. Consumers must use the declared model, and
+leave unsupported or unspecified nonzero distortion explicitly unresolved.
+
 A camera entry names an importable factory:
 
 ```yaml
@@ -80,6 +86,10 @@ Only two methods are required:
 `CameraFrame.rgb` must be a height × width × 3 RGB `uint8` array. Optional depth is a
 height × width pixel-aligned `uint16` array. The SDK freezes arrays so reuse of a
 vendor buffer cannot mutate an earlier sample.
+
+The built-in Orbbec adapter requests complete native color/depth framesets before
+software depth-to-color alignment. Missing aligned output remains a scoped capture
+failure; an unaligned or partial pair is never returned as a valid RGB-D sample.
 
 One `CameraSample` receives an atomic session-monotonic/Unix timestamp pair after
 capture. Raw metric depth remains local. A media-enabled session may publish RGB and

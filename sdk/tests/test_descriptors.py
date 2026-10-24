@@ -43,7 +43,8 @@ def test_bimanual_composite_reference_output():
     assert parts[0]["space"]["jointPosition"]["joints"][0] == {"name": "l0"}
 
 
-def test_compiled_robot_round_trips_through_core_validation():
+@pytest.mark.parametrize("lens", ["unspecified", "modified_brown_conrady", "inverse_brown_conrady"])
+def test_compiled_robot_round_trips_through_core_validation(lens):
     robot = descriptors.Robot(
         name="bimanual",
         robot_id="bot-1",
@@ -57,7 +58,13 @@ def test_compiled_robot_round_trips_through_core_validation():
             rate_hz=50,
             chunking=descriptors.Chunking(horizon=20, replan="immediate", interp="linear"),
         ),
-        cameras={"wrist": descriptors.Camera(width=640, height=480, fps=30, encoding="rgb8")},
+        cameras={"wrist": descriptors.Camera(
+            width=640, height=480, fps=30, encoding="rgb8",
+            intrinsics=descriptors.Intrinsics(
+                600, 600, 320, 240, distortion_model=lens,
+                distortion=(.01, .02, .001, .002, .03),
+            ),
+        )},
     )
     control = Control(
         send=lambda chunk: None,

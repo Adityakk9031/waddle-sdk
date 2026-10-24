@@ -11,6 +11,18 @@ ships; this root file always carries `[Unreleased]` plus pointers.
 
 ## [Unreleased]
 
+### Fixed
+
+- Read completed immutable YAM feedback publications without waiting on the CAN
+  transaction lock for the verified pinned I2RT implementation. Preserve original
+  motor-loop behavior and feedback liveness/stall checks; unverified revisions
+  retain vendor observation locking.
+
+- Require complete Orbbec color/depth framesets before alignment; report absent
+  filter output as an Orbbec RGB-D error instead of a Python attribute error.
+
+- Preserve active RealSense RGB distortion identity, including append-only wire values for modified and inverse Brown–Conrady. Do not mislabel these images as rectified or ROS plumb_bob.
+
 - Add `waddle_sdk.media.PreviewPublisher` for camera-only RGB publication from a
   separate presentation process, without Site/device/run/control ownership.
   Preserve source dimensions/timestamps and native demand/rate/bitrate bounds.

@@ -92,7 +92,11 @@ from ..descriptors import (
 )
 from ..runtime import FaultCode, RuntimeFault
 from . import base
-from ._i2rt_patches import apply_command_state_atomic_patch, apply_recv_starvation_patch
+from ._i2rt_patches import (
+    apply_command_state_atomic_patch,
+    apply_observation_snapshot_patch,
+    apply_recv_starvation_patch,
+)
 from .base import CrossArm
 from .socketcan import ensure_socketcan_up
 
@@ -782,6 +786,17 @@ class LiveDriver:
             # A vendor type without that optional method still takes the
             # documented position-only path below.
             apply_command_state_atomic_patch(type(self._robot))
+            self._snapshot_observations = apply_observation_snapshot_patch(
+                type(self._robot)
+            )
+            self._report(
+                f"live {self.channel}: feedback reads use "
+                + (
+                    "completed immutable snapshots"
+                    if self._snapshot_observations
+                    else "vendor observation locking"
+                )
+            )
             dofs = int(self._robot.num_dofs())
             if dofs != JOINT_COUNT:
                 raise RuntimeError(

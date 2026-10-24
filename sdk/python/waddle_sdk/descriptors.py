@@ -338,7 +338,8 @@ class Opaque(_Space):
 class Intrinsics:
     """Pinhole + distortion, ROS ``CameraInfo`` lineage. ``distortion_model``
     accepts short case-insensitive names (``"plumb_bob"``,
-    ``"rational_polynomial"``, ``"kannala_brandt"``) or ``"unspecified"``
+    ``"rational_polynomial"``, ``"kannala_brandt"``,
+    ``"modified_brown_conrady"``, ``"inverse_brown_conrady"``) or ``"unspecified"``
     (the default: no distortion model declared)."""
 
     fx: float
@@ -368,6 +369,8 @@ class Intrinsics:
                 "plumb_bob": "PLUMB_BOB",
                 "rational_polynomial": "RATIONAL_POLYNOMIAL",
                 "kannala_brandt": "KANNALA_BRANDT",
+                "modified_brown_conrady": "MODIFIED_BROWN_CONRADY",
+                "inverse_brown_conrady": "INVERSE_BROWN_CONRADY",
             },
             "distortion_model",
         )

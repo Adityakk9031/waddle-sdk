@@ -1,5 +1,21 @@
 # AGENTS.md — waddle-sdk monorepo
 
+YAM feedback reads use a single completed immutable vendor JointStates publication
+when the installed I2RT observation/publication/allocation code matches the
+verified semantic source hashes. This avoids the motor-transaction lock without
+changing the motor loop, commands or CAN liveness/stall checks. Unverified vendor
+implementations retain their original observation method; startup reports the
+selected read path. Software snapshot probes are separate from physical cadence.
+
+The Orbbec RGB-D adapter requires complete native color/depth frame aggregation
+before alignment and reports absent aligned output as a scoped camera error.
+It never returns an unaligned pair or infers a missing depth frame.
+
+RealSense RGB intrinsics retain the active vendor distortion model. The public
+descriptor/wire enum distinguishes modified and inverse Brown–Conrady from ROS
+plumb_bob; older unspecified declarations remain unspecified. Images are not
+rectified by publishing this metadata. Consumers must support the declared model.
+
 Optional gripper force control uses `GripperForceDriver` and the public runtime
 `GripperForce` observation. Named `JointPositionCommand.gripper_force_n` is
 admitted by the existing native gate and owner envelope before driver activation.

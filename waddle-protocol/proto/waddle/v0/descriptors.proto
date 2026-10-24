@@ -296,6 +296,9 @@ enum DistortionModel {
   DISTORTION_MODEL_PLUMB_BOB = 1;
   DISTORTION_MODEL_RATIONAL_POLYNOMIAL = 2;
   DISTORTION_MODEL_KANNALA_BRANDT = 3;
+  // RealSense five-coefficient models; distinct from ROS plumb_bob.
+  DISTORTION_MODEL_MODIFIED_BROWN_CONRADY = 4;
+  DISTORTION_MODEL_INVERSE_BROWN_CONRADY = 5;
 }
 
 // Pinhole + distortion, ROS CameraInfo lineage (design doc §2.2). Uncalibrated
