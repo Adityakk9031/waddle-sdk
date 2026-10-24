@@ -87,6 +87,10 @@ Only two methods are required:
 height × width pixel-aligned `uint16` array. The SDK freezes arrays so reuse of a
 vendor buffer cannot mutate an earlier sample.
 
+The built-in Orbbec adapter requests complete native color/depth framesets before
+software depth-to-color alignment. Missing aligned output remains a scoped capture
+failure; an unaligned or partial pair is never returned as a valid RGB-D sample.
+
 One `CameraSample` receives an atomic session-monotonic/Unix timestamp pair after
 capture. Raw metric depth remains local. A media-enabled session may publish RGB and
 a deterministic colorized depth preview on separate tracks; the adapter does not

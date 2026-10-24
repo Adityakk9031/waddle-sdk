@@ -56,9 +56,7 @@ class OrbbecDriver:
             sdk.OBFormat.RGB,
             fps,
         )
-        depth_format = getattr(
-            sdk.OBFormat, "Y16", getattr(sdk.OBFormat, "Z16", None)
-        )
+        depth_format = getattr(sdk.OBFormat, "Y16", getattr(sdk.OBFormat, "Z16", None))
         if depth_format is None:
             raise RuntimeError(
                 "this pyorbbecsdk build exposes neither Y16 nor Z16 depth"
@@ -73,6 +71,9 @@ class OrbbecDriver:
         )
         config.enable_stream(color)
         config.enable_stream(depth)
+        config.set_frame_aggregate_output_mode(
+            sdk.OBFrameAggregateOutputMode.FULL_FRAME_REQUIRE
+        )
         pipeline.start(config)
         self._pipeline = pipeline
         self._align = sdk.AlignFilter(align_to_stream=sdk.OBStreamType.COLOR_STREAM)
@@ -85,6 +86,8 @@ class OrbbecDriver:
         if frames is None:
             raise RuntimeError("Orbbec timed out waiting for an RGB-D frameset")
         frames = self._align.process(frames)
+        if frames is None:
+            raise RuntimeError("Orbbec alignment returned no RGB-D frameset")
         color = frames.get_color_frame()
         depth = frames.get_depth_frame()
         if color is None or depth is None:
